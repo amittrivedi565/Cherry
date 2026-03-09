@@ -1,22 +1,22 @@
 package main
 
 import (
+	"Cherry/builder"
+	"Cherry/db"
+	"Cherry/dsl"
 	"encoding/json"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-type OperationName string
-
 type BaseRequest struct {
-	Op OperationName `json:"op"`
+	Op string `json:"op"`
 }
 
 func main() {
 
-	db := GetInstance()
-
+	db := db.GetInstance()
 	r := gin.Default()
 
 	r.POST("/exec", func(c *gin.Context) {
@@ -36,46 +36,38 @@ func main() {
 		var query string
 
 		switch base.Op {
-
-		case "create":
-			var obj Create
-			if err := json.Unmarshal(body, &obj); err != nil {
-				c.JSON(400, gin.H{"error": err.Error()})
-				return
-			}
-			query = BuildCreate(obj)
-
+			
 		case "insert":
-			var obj Insert
+			var obj dsl.Insert
 			if err := json.Unmarshal(body, &obj); err != nil {
 				c.JSON(400, gin.H{"error": err.Error()})
 				return
 			}
-			query = BuildInsert(obj)
+			query = builder.BuildInsert(obj)
 
 		case "update":
-			var obj Update
+			var obj dsl.Update
 			if err := json.Unmarshal(body, &obj); err != nil {
 				c.JSON(400, gin.H{"error": err.Error()})
 				return
 			}
-			query = BuildUpdate(obj)
+			query = builder.BuildUpdate(obj)
 
 		case "delete":
-			var obj Delete
+			var obj dsl.Delete
 			if err := json.Unmarshal(body, &obj); err != nil {
 				c.JSON(400, gin.H{"error": err.Error()})
 				return
 			}
-			query = BuildDelete(obj)
+			query = builder.BuildDelete(obj)
 
 		case "select":
-			var obj Select
+			var obj dsl.Select
 			if err := json.Unmarshal(body, &obj); err != nil {
 				c.JSON(400, gin.H{"error": err.Error()})
 				return
 			}
-			query = BuildSelect(obj)
+			query = builder.BuildSelect(obj)
 
 		default:
 			c.JSON(400, gin.H{"error": "invalid operation"})

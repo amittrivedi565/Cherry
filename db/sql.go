@@ -1,4 +1,4 @@
-package main
+package db
 
 import (
 	"database/sql"
@@ -6,10 +6,6 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 )
-
-type DSL interface {
-	Insert | Select | Update | Delete
-}
 
 type Database struct {
 	Conn *sql.DB
